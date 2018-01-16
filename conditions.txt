@@ -1,0 +1,10 @@
+metal?plastic
+
+internal?human
+
+2?4
+
+
+3 conditions
+
+response.setHeader ("Content-Disposition","attachment; filename=voucher")

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title></title>
+	<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/12.2.13/ng-file-upload-all.js"></script>
+<!-- Angular Material requires Angular.js Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+
+  <!-- Angular Material Library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/locale/af.js"></script>
+  <script>
+    moment().format();
+</script>
+<style type="text/css">
+body{
+  text-align: center;
+}
+
+	.thumb {
+    width: 24px;
+    height: 24px;
+    float: none;
+    position: relative;
+    top: 7px;
+}
+
+form .progress {
+    line-height: 15px;
+}
+
+.progress {
+    display: inline-block;
+    width: 100px;
+    border: 3px groove #CCC;
+}
+
+.progress div {
+    font-size: smaller;
+    background: orange;
+    width: 0;
+}
+
+.drop-box{
+  text-align: center;
+}
+
+[ng-click],
+[data-ng-click],
+[x-ng-click],
+button {
+    cursor: pointer;
+}
+.mobile-upload{
+      display: none;
+      margin-top: 20vh;
+    }
+    .desktop-upload{
+      display: block;
+    }
+@media only screen and (orientation:portrait) {
+
+    .mobile-upload{
+      display: block;
+    }
+    .desktop-upload{
+      display: none;
+    }
+}
+</style>
+
+<script type="text/javascript">
+	//inject angular file upload directives and services.
+var app = angular.module('fileUpload', ['ngFileUpload']);
+
+
+app.controller('MyCtrl', ['$scope','$http', 'Upload', '$timeout', function ($scope,$http, Upload, $timeout) {
+
+  $scope.showUploadFiles=true;
+  /* ------------------------------------------------- SHOW MORE DETAILS -----------------------------------------------*/
+  $scope.showMoreDetails = function(id){
+    $http({
+        method: 'GET',
+        url: 'http://127.0.0.1:8081/XMLScanner/get/'+id
+      }).then(function successCallback(response) {
+          // this callback will be called asynchronously
+          // when the response is available
+
+          $scope.modalVehicles = response.data;
+          $scope.bigWheels = 0;
+          $scope.bicycles = 0;
+          $scope.motorcycles = 0;
+          $scope.handGliders = 0;
+          $scope.cars = 0;
+          for (var i = $scope.modalVehicles.length - 1; i >= 0; i--) {
+            var date = $scope.modalVehicles[i].timestamp;
+            $scope.modalVehicles[i].timestamp = date.dayOfMonth + "/" + date.monthValue + "/" + date.year  + " " + (date.hour<10?"0"+date.hour:date.hour) + ":" + (date.minute<10?"0"+date.minute:date.minute) + ":" + (date.second<10?"0"+date.second:date.second) + "";
+
+
+            if ($scope.modalVehicles[i].type =='Big Wheel') {
+              $scope.bigWheels++
+            }
+            if ($scope.modalVehicles[i].type =='Bicycle') {
+              $scope.bicycles++
+            }
+            if ($scope.modalVehicles[i].type =='Motorcycle') {
+              $scope.motorcycles++
+            }
+            if ($scope.modalVehicles[i].type =='Hand Glider') {
+              $scope.handGliders++
+            }
+            if ($scope.modalVehicles[i].type =='Car') {
+              $scope.cars++
+            }
+          }
+          console.log(response.data);
+        }, function errorCallback(response) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+          console.log("error");
+        });
+  }
+
+  /* ------------------------------------------------- SHOW ALL FILES -----------------------------------------------*/
+  $scope. showAllFiles=function(value){
+    console.log("showAllFiles");
+    $scope.showUploadFiles=value;
+    if (value==true) {
+      
+      document.getElementById("upload-tab-a").classList.add("active");
+      document.getElementById("show-all-tab-a").classList.remove("active");
+    }
+    else{
+      
+      document.getElementById("show-all-tab-a").classList.add("active");
+      document.getElementById("upload-tab-a").classList.remove("active");
+      $http({
+        method: 'GET',
+        url: 'http://127.0.0.1:8081/XMLScanner/getAll'
+      }).then(function successCallback(response) {
+          // this callback will be called asynchronously
+          // when the response is available
+
+          $scope.pastUploads = response.data;
+          for (var i = $scope.pastUploads.length - 1; i >= 0; i--) {
+            var date = $scope.pastUploads[i].timestamp;
+            $scope.pastUploads[i].timestamp = date.dayOfMonth + "/" + date.monthValue + "/" + date.year  + " " + (date.hour<10?"0"+date.hour:date.hour) + ":" + (date.minute<10?"0"+date.minute:date.minute) + ":" + (date.second<10?"0"+date.second:date.second) + "";
+
+          }
+
+          console.log(response.data);
+        }, function errorCallback(response) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+          console.log("error");
+        });
+    }
+    
+
+  }
+  /* ------------------------------------------------- UPLOAD FILES -----------------------------------------------*/
+    $scope.uploadFiles = function(file, errFiles) {
+        $scope.f = file;
+        $scope.errFile = errFiles && errFiles[0];
+        $scope.uploadTime=new Date();
+        $scope.uploadTime = "" + $scope.uploadTime.getDate() + "/" + $scope.uploadTime.getMonth() + "/" + $scope.uploadTime.getFullYear() + " " + $scope.uploadTime.getHours() + ":" + $scope.uploadTime.getMinutes() + ":" + $scope.uploadTime.getSeconds();
+        
+        if (file) {
+            file.upload = Upload.upload({
+                url: 'http://127.0.0.1:8081/XMLScanner/fileUpload',
+                data: {file: file}
+            });
+
+            file.upload.then(function (response) {
+                $timeout(function () {
+                    file.result = response.data;
+                    $scope.errorMsg ="";
+                    $scope.vehicles=[];
+                    
+                      $scope.vehicles=response.data;
+                      $scope.bigWheels = 0;
+                      $scope.bicycles = 0;
+                      $scope.motorcycles = 0;
+                      $scope.handGliders = 0;
+                      $scope.cars = 0;
+
+                      for (var i = $scope.vehicles.length - 1; i >= 0; i--) {
+
+                        if ($scope.vehicles[i].type =='Big Wheel') {
+                          $scope.bigWheels++
+                        }
+                        if ($scope.vehicles[i].type =='Bicycle') {
+                          $scope.bicycles++
+                        }
+                        if ($scope.vehicles[i].type =='Motorcycle') {
+                          $scope.motorcycles++
+                        }
+                        if ($scope.vehicles[i].type =='Hand Glider') {
+                          $scope.handGliders++
+                        }
+                        if ($scope.vehicles[i].type =='Car') {
+                          $scope.cars++
+                        }
+
+                      }
+
+                      console.log('hello');
+                    
+                });
+            }, function (response) {
+                if (response.status > 0)
+                    $scope.errorMsg = response.status + ': ' + response.data;
+            }, function (evt) {
+                file.progress = Math.min(100, parseInt(100.0 * 
+                                         evt.loaded / evt.total));
+            });
+        }   
+    }// scope.uploadFiles()
+
+
+
+
+}]);
+</script>
+</head>
+<body ng-app="fileUpload" ng-controller="MyCtrl" >
+  
+
+
+<ul class="nav nav-tabs">
+  <li class="nav-item upload-tab" id="upload-tab">
+    <a class="nav-link active" id="upload-tab-a" ng-click="showAllFiles(true)">Upload</a>
+  </li>
+  <li class="nav-item show-all-tab" id="show-all-tab">
+    <a class="nav-link" id="show-all-tab-a" ng-click="showAllFiles(false)">Show All</a>
+  </li>
+  
+</ul>
+<div class="upload" ng-if="showUploadFiles">
+
+  <div class="mobile-upload">
+      <button class="btn btn-success" type="file" ngf-select="uploadFiles($file, $invalidFiles)"
+              accept="text/xml" ngf-max-height="1000" ngf-max-size="1MB">
+          Select File</button>
+      <br><br>
+  </div>
+  <div class="desktop-upload">
+  <div ngf-drop="uploadFiles($file, $invalidFiles)" class="drop-box jumbotron"
+  ngf-drag-over-class="'dragover'" ngf-multiple="true" 
+  ngf-pattern="'text/xml'">Drop XML files here</div>
+<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div> 
+</div>
+<div style="font:smaller"> {{errFile.name}} {{errFile.$error}} {{errFile.$errorParam}}
+      
+  </div> 
+  <div class="table-responsive" ng-if="vehicles!=undefined">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Vehicle type</th>
+        <th>Frame</th>
+        <th>PowerTrain</th>
+        <th>Wheels</th>
+        <th>Upload Time</th>
+        <th>File</th>
+      </tr>
+    </thead>
+    <tr ng-repeat="vehicle in vehicles">
+      <td>
+        {{vehicle.type}}
+      </td>
+      <td>{{vehicle.frame}}</td>
+      <td>{{vehicle.powerTrain}}</td>
+      <td>{{vehicle.numberOfWheels}}</td>
+      <td>
+        {{uploadTime}}
+      </td>
+      <td><a class="btn btn-success" ng-href="http://127.0.0.1:8081/XMLScanner/download/{{vehicle.fileID}}" download="file.xml">Download</a></td>
+    </tr>
+  </table>
+</div>  
+  {{errorMsg}}
+
+<div ng-if="vehicles!=undefined">
+  The total number of vehicles is {{numberOfVehicles}}, of which there are {{bigWheels}} BigWheels, {{bicycles}} Bicycles, {{motorcycles}} Motorcycles, {{handGliders}} Hand Gliders and {{cars}} Cars.
+</div>
+</div>
+
+
+<div ng-if="!showUploadFiles">
+  <div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Timestamp</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tr ng-repeat="item in pastUploads">
+      <td>
+        {{item.id}}
+      </td>
+    
+      <td>
+        {{item.timestamp}}
+      </td>
+      <td >
+        <button class="btn btn-success" data-toggle="modal" data-target="#myModal" ng-click="showMoreDetails(item.id)">More Details</button>
+      </td>
+    </tr>
+  </table>
+</div>
+</div>
+
+
+<!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Details</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          
+        </div>
+        <div class="modal-body">
+          <table>
+    <thead>
+      <tr>
+        <th>Vehicle type</th>
+        <th>Frame</th>
+        <th>PowerTrain</th>
+        <th>Wheels</th>
+        <th>Upload Time</th>
+        <th>File</th>
+      </tr>
+    </thead>
+    <tr ng-repeat="vehicle in modalVehicles">
+      <td>
+        {{vehicle.type}}
+      </td>
+      <td>{{vehicle.frame}}</td>
+      <td>{{vehicle.powerTrain}}</td>
+      <td>{{vehicle.numberOfWheels}}</td>
+      <td>
+        {{vehicle.timestamp}}
+      </td>
+      <td><a class="btn btn-success" ng-href="http://127.0.0.1:8081/XMLScanner/download/{{vehicle.fileID}}" download="file.xml">Download</a></td>
+    </tr>
+  </table>
+        </div>
+        <div class="modal-footer">
+          The total number of vehicles is {{numberOfVehicles}}, of which there are {{bigWheels}} BigWheels, {{bicycles}} Bicycles, {{motorcycles}} Motorcycles, {{handGliders}} Hand Gliders and {{cars}} Cars.
+          <!-- <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button> -->
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+</body>
+</html>
